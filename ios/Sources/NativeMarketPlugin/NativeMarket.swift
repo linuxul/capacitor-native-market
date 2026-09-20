@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 import Capacitor
 
 /**
@@ -10,11 +11,11 @@ public class NativeMarket: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "NativeMarket"
     public let jsName = "NativeMarket"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "openStoreListing", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "openDevPage", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "openCollection", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "openEditorChoicePage", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "search", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "openStoreListing", returnType: .promise),
+        CAPPluginMethod(name: "openDevPage", returnType: .promise),
+        CAPPluginMethod(name: "openCollection", returnType: .promise),
+        CAPPluginMethod(name: "openEditorChoicePage", returnType: .promise),
+        CAPPluginMethod(name: "search", returnType: .promise)
     ]
 
     @objc func openStoreListing(_ call: CAPPluginCall) {
