@@ -11,55 +11,54 @@ public class NativeMarket: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "NativeMarket"
     public let jsName = "NativeMarket"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "openStoreListing", returnType: .promise),
-        CAPPluginMethod(name: "openDevPage", returnType: .promise),
-        CAPPluginMethod(name: "openCollection", returnType: .promise),
-        CAPPluginMethod(name: "openEditorChoicePage", returnType: .promise),
-        CAPPluginMethod(name: "search", returnType: .promise)
+        .async("openStoreListing", NativeMarket.openStoreListing),
+        .promise("openDevPage", NativeMarket.openDevPage),
+        .promise("openCollection", NativeMarket.openCollection),
+        .promise("openEditorChoicePage", NativeMarket.openEditorChoicePage),
+        .async("search", NativeMarket.search)
     ]
 
-    @objc func openStoreListing(_ call: CAPPluginCall) {
-        if let appId = call.getString("appId") {
-            let url = "itms-apps://itunes.apple.com/app/" + appId
-            let appUrl = URL(string: url)
-
-            DispatchQueue.main.async {
-                if UIApplication.shared.canOpenURL(appUrl!) {
-                    UIApplication.shared.open(appUrl!, options: [:]) { (_) in
-                        call.resolve()
-                    }
-                }
-            }
-        } else {
-            call.reject("appId is missing")
+    /// Opens the App Store page of the app. UIApplication is main-thread API, so the method runs on the main actor.
+    @MainActor
+    func openStoreListing(_ call: CAPPluginCall) async throws {
+        guard let appId = call.getString("appId") else {
+            throw CAPPluginError("appId is missing")
         }
+        try await Self.open("itms-apps://itunes.apple.com/app/" + appId)
     }
 
-    @objc func openDevPage(_ call: CAPPluginCall) {
-        call.resolve() // TODO: Implement
+    // openDevPage, openCollection and openEditorChoicePage are Google Play pages the App Store has no counterpart for.
+    // They are not supported on iOS and resolve without opening anything, as they always have.
+
+    func openDevPage(_ call: CAPPluginCall) {
+        call.resolve()
     }
 
-    @objc func openCollection(_ call: CAPPluginCall) {
-        call.resolve() // TODO: Implement
+    func openCollection(_ call: CAPPluginCall) {
+        call.resolve()
     }
 
-    @objc func openEditorChoicePage(_ call: CAPPluginCall) {
-        call.resolve() // TODO: Implement
+    func openEditorChoicePage(_ call: CAPPluginCall) {
+        call.resolve()
     }
 
-    @objc func search(_ call: CAPPluginCall) {
-        if let terms = call.getString("terms") {
-            let url = "itms-apps://itunes.apple.com/search?term=" + terms
-            let appUrl = URL(string: url)
-
-            if UIApplication.shared.canOpenURL(appUrl!) {
-                UIApplication.shared.open(appUrl!, options: [:]) { (_) in
-                    call.resolve()
-                }
-            }
-        } else {
-            call.reject("terms is missing")
+    /// Opens an App Store search. UIApplication is main-thread API, so the method runs on the main actor.
+    @MainActor
+    func search(_ call: CAPPluginCall) async throws {
+        guard let terms = call.getString("terms") else {
+            throw CAPPluginError("terms is missing")
         }
+        try await Self.open("itms-apps://itunes.apple.com/search?term=" + terms)
     }
 
+    /// Opens `link` and returns once UIApplication handled it, whether or not it succeeded, as before. Throws when
+    /// `link` is not a URL or the system cannot open it (no App Store, as on the simulator, or `itms-apps` missing
+    /// from `LSApplicationQueriesSchemes`).
+    @MainActor
+    static func open(_ link: String) async throws {
+        guard let url = URL(string: link), UIApplication.shared.canOpenURL(url) else {
+            throw CAPPluginError("Unable to open \(link)")
+        }
+        _ = await UIApplication.shared.open(url, options: [:])
+    }
 }
