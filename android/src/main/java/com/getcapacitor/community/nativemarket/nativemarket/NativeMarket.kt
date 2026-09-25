@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
+import com.getcapacitor.PluginException
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 
@@ -11,19 +12,18 @@ import com.getcapacitor.annotation.CapacitorPlugin
 public class NativeMarket : Plugin() {
     @PluginMethod
     public fun openStoreListing(call: PluginCall) {
+        if (!call.data.has("appId")) {
+            throw PluginException("appId is missing")
+        }
         try {
-            if (call.data.has("appId")) {
-                val appId = call.getString("appId")
+            val appId = call.getString("appId")
 
-                val context = bridge.activity.applicationContext
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appId"))
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
+            val context = bridge.activity.applicationContext
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appId"))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
 
-                call.resolve()
-            } else {
-                call.reject("appId is missing")
-            }
+            call.resolve()
         } catch (ex: Exception) {
             call.reject(ex.localizedMessage)
         }
@@ -31,19 +31,18 @@ public class NativeMarket : Plugin() {
 
     @PluginMethod
     public fun openDevPage(call: PluginCall) {
+        if (!call.data.has("devId")) {
+            throw PluginException("devId is missing")
+        }
         try {
-            if (call.data.has("devId")) {
-                val devId = call.getString("devId")
+            val devId = call.getString("devId")
 
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.setData(Uri.parse("https://play.google.com/store/apps/dev?id=$devId"))
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setData(Uri.parse("https://play.google.com/store/apps/dev?id=$devId"))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
 
-                call.resolve()
-            } else {
-                call.reject("devId is missing")
-            }
+            call.resolve()
         } catch (ex: Exception) {
             call.reject(ex.localizedMessage)
         }
@@ -51,19 +50,18 @@ public class NativeMarket : Plugin() {
 
     @PluginMethod
     public fun openCollection(call: PluginCall) {
+        if (!call.data.has("name")) {
+            throw PluginException("name is missing")
+        }
         try {
-            if (call.data.has("name")) {
-                val name = call.getString("name")
+            val name = call.getString("name")
 
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.setData(Uri.parse("https://play.google.com/store/apps/collection/$name"))
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setData(Uri.parse("https://play.google.com/store/apps/collection/$name"))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
 
-                call.resolve()
-            } else {
-                call.reject("name is missing")
-            }
+            call.resolve()
         } catch (ex: Exception) {
             call.reject(ex.localizedMessage)
         }
@@ -71,19 +69,18 @@ public class NativeMarket : Plugin() {
 
     @PluginMethod
     public fun openEditorChoicePage(call: PluginCall) {
+        if (!call.data.has("editorChoice")) {
+            throw PluginException("editorChoice is missing")
+        }
         try {
-            if (call.data.has("editorChoice")) {
-                val editorChoice = call.getString("editorChoice")
+            val editorChoice = call.getString("editorChoice")
 
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.setData(Uri.parse("https://play.google.com/store/apps/topic?id=$editorChoice"))
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setData(Uri.parse("https://play.google.com/store/apps/topic?id=$editorChoice"))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
 
-                call.resolve()
-            } else {
-                call.reject("editorChoice is missing")
-            }
+            call.resolve()
         } catch (ex: Exception) {
             call.reject(ex.localizedMessage)
         }
@@ -91,18 +88,17 @@ public class NativeMarket : Plugin() {
 
     @PluginMethod
     public fun search(call: PluginCall) {
+        if (!call.data.has("terms")) {
+            throw PluginException("terms is missing")
+        }
         try {
-            if (call.data.has("terms")) {
-                val terms = call.getString("terms")
+            val terms = call.getString("terms")
 
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=$terms"))
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=$terms"))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
 
-                call.resolve()
-            } else {
-                call.reject("terms is missing")
-            }
+            call.resolve()
         } catch (ex: Exception) {
             call.reject(ex.localizedMessage)
         }
